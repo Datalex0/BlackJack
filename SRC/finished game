@@ -1,0 +1,220 @@
+
+#initialisation de la variable pour boucler le jeu tant que la variable ne change pas 
+retry = "o"
+import time
+
+'''
+*** Règles du jeu ***
+Le Blackjack se joue contre le croupier.
+Tu dois t'approcher le plus près possible des 21 points, sans les dépasser.
+Ensuite le croupier tente de faire mieux que toi.
+S'il n'arrive pas à te dépasser sans dépasser les 21, c'est gagné !
+
+*** Valeur des cartes ***
+1 à 10 : valeur notée
+Valet : 10 points
+Dame : 10 points
+Roi : 10 points
+As : 1 ou 11 
+'''
+
+#fonction again pour recommencer le jeu
+def again():
+  time.sleep(1)
+  replay = input("On recommence ? (o/n) : ")
+  print(" ")
+
+  if replay == "n":
+    print("")
+    print(f"Ok, merci d'avoir joué {joueur}. A+ ")
+    return "n"
+
+  elif replay == "o":
+    return "o"
+
+  else :
+    print("Oops..")
+    return again()
+
+
+# le jeu boucle tant que retry=="o"
+while retry == "o":
+
+  from art import *
+  print("\n")
+  tprint("Blackjack")
+  print("\n")
+  time.sleep(1)
+  print("Rapproche toi des 21 points sans les dépasser.")
+  time.sleep(1)
+  print("Enjoy !")
+  print("\n")
+  time.sleep(1)
+
+  #initialisation des compteurs de points
+  ptsJoueur = 0
+  ptsBank = 0
+
+  #liste des cartes
+  cartes = ["un As", 2, 3, 4, 5, 6, 7, 8, 9, 10, "un Valet", "une Dame", "un Roi"]
+
+  #le joueur entre son nom
+  joueur = input("Entre ton nom : ")
+  time.sleep(1)
+  print("\n")
+  print("\n")
+
+  As=11
+  nb_as=0
+  
+  import random
+  
+  #choix d'une 1ère carte de façon aléatoire 
+  carte=random.choice(cartes)
+  print(f"Ta 1ère carte est : {str(carte)}")
+  time.sleep(1)
+
+  
+  #fonction compteur d'as pour détecter qd ptsJoueur>22 si il y  un ou plusieurs as dans le jeu
+  def compt_as() :
+    if carte == "un As" and As==11 :
+      return 1
+    else :
+      return 0
+  
+  
+  #valeur des cartes
+  def ValCartes():
+    if carte == "un Valet" or carte == "une Dame" or carte == "un Roi":
+      point = 10
+    elif carte == "un As":
+      point = As
+    else :
+      point = carte
+    return point
+
+  
+  ptsJoueur = ValCartes()
+  print(f"{joueur} : {ptsJoueur} points")
+  time.sleep(1)
+  print("\n")
+
+  nb_as += compt_as() #compteur d'as
+  
+  while ptsJoueur < 22:
+    #si le joueur obtient 21pts, c'est au tour du croupier
+    if ptsJoueur == 21:
+      print(f"Ton score est de {ptsJoueur} points.")
+      time.sleep(1)
+      print("\n")
+      print("Au tour du croupier :")
+      time.sleep(1)
+      break
+
+    else:
+
+      #choix du joueur de tirer une autre carte ou non
+      choix = input("Veux-tu une autre carte ? (o/n) : ")
+      print("\n")
+      time.sleep(1)
+
+      #si le joueur décide de tirer une autre carte
+      if choix == "o":
+        #nouvelle carte tirée de façon aléatoire 
+        carte = random.choice(cartes)
+        #l'as vaut 1 si le nombre de points dépasse 22
+        if ptsJoueur + ValCartes() > 22:
+          As = 1
+        nb_as += compt_as() #compteur d'as
+        print(f"Ta carte est : {str(carte)} ")
+        time.sleep(1)
+        ptsJoueur = ptsJoueur + ValCartes()
+        time.sleep(1)
+        #si le joueur a plus de 21pts et qu'il a tiré un ou des as, alors les as à 11pts passent à 1pt et le compteur d'as diminue en fonction 
+        if nb_as > 0 and ptsJoueur > 21 :
+          while nb_as!=0 and ptsJoueur > 21 :
+            ptsJoueur -= 10
+            nb_as -= 1
+        print(f"{joueur} : {ptsJoueur} points")
+        As = 11
+        time.sleep(1)
+        print("\n")
+
+      #si le joueur ne veut plus tirer de carte, c'est au tour du croupier
+      elif choix == "n":
+        print(f"Ton score est de {ptsJoueur} points.")
+        time.sleep(1)
+        print("\n")
+        print("Au tour du croupier :")
+        time.sleep(1)
+        print("\n")
+        break
+
+      #si le choix du joueur n'est ni "o" ni "n"
+      else:
+        print(f"{choix} n'est pas un choix valide")
+        time.sleep(1)
+        print("\n")
+
+  #si le joueur dépasse 21pts : défaite 
+  if ptsJoueur > 21:
+    print("Perdu ! Tu as dépassé 21.")
+    time.sleep(1)
+    print("\n")
+    
+    #on propose de recommencer
+    retry = again()
+    continue
+    if retry == "n" :
+      break
+
+  #tour du croupier, on réinitialise le compteur d'as 
+  else:
+    nb_as=0
+    time.sleep(1)
+    
+    #oe croupier joue tant qu'il n'a pas dépassé le joueur ou 21pts
+    while ptsBank < ptsJoueur and ptsBank < 22 :
+      #tirage d'une carte de façon aléatoire 
+      carte = random.choice(cartes)
+      #si les pts dépassent 21, l'as vaut 1
+      if ptsBank > 21:
+        As = 1
+      nb_as += compt_as() #compteur d'as
+      #affichage carte croupier 
+      print(f"La carte du croupier est : {str(carte)}")
+      ptsBank = ptsBank + ValCartes()
+      time.sleep(1) #delai 1sec
+      
+      #si le croupier a plus de 21pts et qu'il a tiré un ou des as, alors les as à 11pts passent à 1pt et le compteur d'as diminue en fonction 
+      if nb_as > 0 and ptsBank > 21 :
+          while nb_as!=0 and ptsBank > 21 :
+            ptsBank = ptsBank - 10
+            nb_as -= 1
+      print(f"Croupier : {ptsBank} points")
+      As = 11
+      time.sleep(3)
+      print("\n")
+
+  #si le croupier dépasse les 21pts : victoie !
+  if ptsBank > 21:
+    print("Félicitations ! Le Croupier a dépassé 21. Tu as gagné !")
+    time.sleep(3)
+    print("\n")
+  #si le croupier atteind le même nb de pts que le joueur : match nul
+  elif ptsBank == ptsJoueur :
+    print("Match nul")
+    time.sleep(3)
+    print("\n")
+  #si le croupier dépasse le joueur snas dépasser 21 : défaite 
+  elif ptsBank > ptsJoueur:
+    print("Le Croupier a plus que toi, tu as perdu.")
+    time.sleep(3)
+    print("\n")
+
+  #on propose de recommencer
+  retry = again()
+  if retry == "n" :
+    break
+
+
